@@ -65,9 +65,9 @@ class Controller():
             print "Could not connect to MongoDb : %s" % e
         
 #define  mongoDB database        
-        db = conn.bibtex_files
+        self.db = conn.bibtex_files
 # define collection where I'll insert my local files data
-        bibtex1 = db.bibtex1
+        bibtex1 = self.db.bibtex1
             
         with open(self.file1) as bibtex1_file:
             bibtex1_str = bibtex1_file.read()
@@ -77,7 +77,7 @@ class Controller():
         for entry_dict in self.bib_database1.entries:
             bibtex1.insert(entry_dict)
 # define collection where I'll insert my master files data            
-        bibtex = db.bibtex
+        bibtex = self.db.bibtex
         with open(self.file2) as bibtex_file:
 
             bibtex_str = bibtex_file.read()
@@ -87,18 +87,18 @@ class Controller():
         for entry_dict in bib_database2.entries:
             bibtex.insert(entry_dict)   
         
-        self.model = Model(self,db,self.bib_database1)
+        self.model = Model(self,self.db,self.bib_database1)
         
-        self.delete_duplicates_from_collection(db.bibtex1)  
-        self.delete_duplicates_from_collection(db.bibtex) 
+        self.delete_duplicates_from_collection(self.db.bibtex1)  
+        self.delete_duplicates_from_collection(self.db.bibtex) 
            
 # list_add_prop if property does not exist in local file
 # list_if_equal if property exist but different values in local file and master file
         list_add_prop = []
         list_if_equal = []
         
-        for element in db.bibtex1.find():
-            cursor = db.bibtex.find({"ID":element["ID"]})
+        for element in self.db.bibtex1.find():
+            cursor = self.db.bibtex.find({"ID":element["ID"]})
             if(cursor.count()>0):
                 for doc in cursor:
                     master = doc  
@@ -129,6 +129,8 @@ class Controller():
             with open(self.file1, 'w') as bibtex_file:
                 bibtex_str = bibtexparser.dumps(self.bib_database1)
                 bibtex_file.write(bibtex_str.encode('utf8'))
+        self.db.bibtex.drop()
+        self.db.bibtex1.drop()
         self.view.close()
         
         
