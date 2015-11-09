@@ -1,7 +1,12 @@
-from Tkinter import *
+from Tkinter import Tk,BOTH, Entry, IntVar
+from ttk import *
+import Tkinter, Tkconstants, tkFileDialog
 from logging import root
 import Tkinter as tk        
-import tkFileDialog
+from Tkinter import *
+from ttk import *
+import Tkinter, Tkconstants, tkFileDialog
+from Finder.Type_Definitions import column
 import bibtexparser
 import pymongo
 
@@ -161,14 +166,14 @@ class View(tk.Frame):
         self.destroy()
         root_close()
         
-    def print_list_buttons(self,list,list_add):
+    def print_list_buttons(self,list_change,list_add):
         if(self.update):
         
-            for idx,val in enumerate(list):
-                if (list[idx][2][3].get()):# + list[idx][1][2]
+            for idx,val in enumerate(list_change):
+                if (list_change[idx][2][3].get()):# + list[idx][1][2]
                     result = self.model.database.bibtex1.update(
-                            {"ID":list[idx][0]},
-                            {"$set":{list[idx][1][0]:list[idx][2][1]},
+                            {"ID":list_change[idx][0]},
+                            {"$set":{list_change[idx][1][0]:list_change[idx][2][1]},
                                 "$currentDate": {"lastModified":True}
                             } 
                                                   
