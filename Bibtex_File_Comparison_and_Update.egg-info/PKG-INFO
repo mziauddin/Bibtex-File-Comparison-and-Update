@@ -1,0 +1,18 @@
+Metadata-Version: 1.1
+Name: Bibtex-File-Comparison-and-Update
+Version: 1.0
+Summary: This application aims to compare two bibtex files and help the user in keeping bibtex records in sync on both the files
+Home-page: UNKNOWN
+Author: Mohammed Ziauddin
+Author-email: mdziauddin@ku.edu
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Development Status :: 1- Beta
+Classifier: Natural Language :: English
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
