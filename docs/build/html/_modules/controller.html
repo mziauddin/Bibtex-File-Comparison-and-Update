@@ -1,0 +1,197 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>controller &mdash; bibtex_project 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="bibtex_project 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for controller</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">model</span>
+<span class="kn">import</span> <span class="nn">pymongo</span>
+<span class="kn">from</span> <span class="nn">bibtexparser</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">Tkinter</span> <span class="kn">import</span> <span class="o">*</span>
+<div class="viewcode-block" id="Controller"><a class="viewcode-back" href="../controller.html#controller.Controller">[docs]</a><span class="k">class</span> <span class="nc">Controller</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot; This class is used as an interface between the model and the view &quot;&quot;&quot;</span>    
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;initialize view instance and compare the given files&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compare_files</span><span class="p">()</span>        
+
+<div class="viewcode-block" id="Controller.compare_files"><a class="viewcode-back" href="../controller.html#controller.Controller.compare_files">[docs]</a>    <span class="k">def</span> <span class="nf">compare_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;parse the two bibtex files using bibtex parser and create two bibtex databases replicate those two databases as mongo databases compare the records from the local file with records from the master file&quot;&quot;&quot;</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">connect_mongo</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">master_file</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">local_file</span><span class="o">.</span><span class="n">get</span><span class="p">())</span>
+        <span class="n">list_add_prop</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">list_if_equal</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="p">(</span><span class="n">list_if_equal</span><span class="p">,</span><span class="n">list_add_prop</span><span class="p">)</span> <span class="o">=</span> <span class="n">compare_records</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_local</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_master</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">list_differences</span><span class="p">(</span><span class="n">list_if_equal</span><span class="p">,</span><span class="n">list_add_prop</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Controller.update"><a class="viewcode-back" href="../controller.html#controller.Controller.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">is_update</span><span class="p">,</span><span class="n">list_change</span><span class="p">,</span><span class="n">list_add</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">            Update the model and the local file with the user driven modifications and close the controller instance</span>
+<span class="sd">            Args:</span>
+<span class="sd">                is_update: Flag indicates if the user made any selections to update the current local file</span>
+<span class="sd">                list_change: List of properties for each record that have different values on the master file and the local file</span>
+<span class="sd">                list_add: List of properties for each record that are present on the master file but not on the local</span>
+<span class="sd">        &quot;&quot;&quot;</span>    
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">is_update</span><span class="p">,</span><span class="n">list_change</span><span class="p">,</span><span class="n">list_add</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">update_bibtexDB</span><span class="p">(</span><span class="n">is_update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_update</span><span class="p">(</span><span class="n">is_update</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Controller.file_update"><a class="viewcode-back" href="../controller.html#controller.Controller.file_update">[docs]</a>    <span class="k">def</span> <span class="nf">file_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">is_update</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Update the current local file with changes selected by the user</span>
+<span class="sd">            Args:</span>
+<span class="sd">                is_update: Flag indicates if the user made any selections to update the current local file            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">is_update</span><span class="p">):</span>
+            <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">local_file</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="s">&#39;w&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">local_file</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span> <span class="s">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">bibtex_file</span><span class="p">:</span>
+                <span class="n">bibtex_str</span> <span class="o">=</span> <span class="n">bibtexparser</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">bibdb_local</span><span class="p">)</span>
+                <span class="n">bibtex_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">bibtex_str</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">&#39;utf8&#39;</span><span class="p">))</span></div>
+
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="connect_mongo"><a class="viewcode-back" href="../controller.html#controller.connect_mongo">[docs]</a><span class="k">def</span> <span class="nf">connect_mongo</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Connect to the pymongo client</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            pymongo.errors.ConnectionFailure: If no mongo server is running</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">conn</span> <span class="o">=</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">MongoClient</span><span class="p">()</span>
+        <span class="k">print</span> <span class="s">&quot;Connected Successfully&quot;</span>
+        <span class="k">return</span> <span class="n">conn</span>
+    <span class="k">except</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ConnectionFailure</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot;Could not connect to MongoDb&quot;</span></div>
+        
+<div class="viewcode-block" id="delete_id"><a class="viewcode-back" href="../controller.html#controller.delete_id">[docs]</a><span class="k">def</span> <span class="nf">delete_id</span> <span class="p">(</span><span class="n">elem</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete the property &#39;_id&#39; from the dictionary</span>
+<span class="sd">        Args:</span>
+<span class="sd">            elem: Dictionary</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">elem</span><span class="p">:</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">each</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="s">&quot;_id&quot;</span><span class="p">):</span>
+            <span class="n">elem</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">each</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">elem</span></div>
+
+<div class="viewcode-block" id="compare_records"><a class="viewcode-back" href="../controller.html#controller.compare_records">[docs]</a><span class="k">def</span> <span class="nf">compare_records</span><span class="p">(</span><span class="n">coll1</span><span class="p">,</span><span class="n">coll2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compares the records in the mongo db collection coll1 with the records in collection coll2 and prepares two lists</span>
+<span class="sd">        Args:</span>
+<span class="sd">            coll1: Local File MongoDb collection</span>
+<span class="sd">            coll2: Master File MongoDb collection</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            (list1,list2): list1 has records with properties having different values on the two colelctions </span>
+<span class="sd">                list2 has records with properties present in coll2 but not in coll1</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tk</span><span class="o">=</span><span class="n">Tk</span><span class="p">()</span>
+    <span class="n">list_if_equal</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">list_add_prop</span><span class="o">=</span><span class="p">[]</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">coll1</span><span class="o">.</span><span class="n">find</span><span class="p">():</span>
+        <span class="n">cursor</span> <span class="o">=</span> <span class="n">coll2</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;ID&quot;</span><span class="p">:</span><span class="n">element</span><span class="p">[</span><span class="s">&quot;ID&quot;</span><span class="p">]})</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">count</span><span class="p">()</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+                <span class="n">master</span> <span class="o">=</span> <span class="n">doc</span>  
+            <span class="n">a</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">master</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+            <span class="n">a</span><span class="o">=</span> <span class="n">delete_id</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="n">b</span><span class="o">=</span> <span class="n">delete_id</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="bp">None</span>    
+                <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">a</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">each</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]):</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">each</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">value</span><span class="o">!=</span><span class="bp">None</span><span class="p">):</span>                       
+                            <span class="c">#if the property exists with a different value </span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">!=</span><span class="n">value</span><span class="p">):</span>                            
+                        <span class="n">e</span> <span class="o">=</span> <span class="p">(</span><span class="n">element</span><span class="p">[</span><span class="s">&quot;ID&quot;</span><span class="p">],(</span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">value</span><span class="p">,</span><span class="n">idx</span><span class="p">,</span><span class="n">IntVar</span><span class="p">()),(</span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">idx</span><span class="p">,</span><span class="n">IntVar</span><span class="p">()))</span>
+                        <span class="n">list_if_equal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">e</span> <span class="o">=</span> <span class="p">(</span><span class="n">element</span><span class="p">[</span><span class="s">&quot;ID&quot;</span><span class="p">],(</span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">b</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span><span class="n">idx</span><span class="p">,</span><span class="n">IntVar</span><span class="p">()))</span>
+                    <span class="n">list_add_prop</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+    <span class="n">tk</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span> 
+    <span class="k">return</span> <span class="p">(</span><span class="n">list_if_equal</span><span class="p">,</span><span class="n">list_add_prop</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Mohammed Ziauddin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

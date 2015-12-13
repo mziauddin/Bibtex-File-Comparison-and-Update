@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>model &mdash; bibtex_project 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="bibtex_project 1.0 documentation" href="../index.html" />
+    <link rel="up" title="Module code" href="index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for model</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">bibtexparser</span>
+<span class="kn">import</span> <span class="nn">Tkinter</span> <span class="kn">as</span> <span class="nn">tk</span>        
+<span class="kn">from</span> <span class="nn">Tkinter</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ttk</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">Tkinter</span><span class="o">,</span> <span class="nn">Tkconstants</span><span class="o">,</span> <span class="nn">tkFileDialog</span>
+
+
+<div class="viewcode-block" id="Model"><a class="viewcode-back" href="../model.html#model.Model">[docs]</a><span class="k">class</span> <span class="nc">Model</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Creates and maintains the MongoDb and Bibtex databases&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">conn</span><span class="p">,</span><span class="n">master</span><span class="p">,</span><span class="n">local</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;define  mongoDB database&quot;&quot;&quot;</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span> <span class="o">=</span> <span class="n">conn</span><span class="o">.</span><span class="n">bibtex_files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_local</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_master</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot; define collection where I&#39;ll insert my local files data&quot;&quot;&quot;</span>
+        <span class="n">mongo_local</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_local</span>
+        <span class="sd">&quot;&quot;&quot; define collection where I&#39;ll insert my master files data&quot;&quot;&quot;</span>
+        <span class="n">mongo_master</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_master</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">local</span><span class="p">)</span> <span class="k">as</span> <span class="n">bibtex_file</span><span class="p">:</span>
+            <span class="n">bibtex_str</span> <span class="o">=</span> <span class="n">bibtex_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot;create bibtex database for local file&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bibdb_local</span> <span class="o">=</span> <span class="n">bibtexparser</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">bibtex_str</span><span class="p">)</span>             
+        <span class="k">for</span> <span class="n">entry_dict</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bibdb_local</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="n">mongo_local</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">entry_dict</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">master</span><span class="p">)</span> <span class="k">as</span> <span class="n">bibtex_file</span><span class="p">:</span>
+            <span class="n">bibtex_str</span> <span class="o">=</span> <span class="n">bibtex_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="sd">&quot;&quot;&quot;create bibtex database for master file&quot;&quot;&quot;</span>
+        <span class="n">bibdb_master</span> <span class="o">=</span> <span class="n">bibtexparser</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">bibtex_str</span><span class="p">)</span>             
+        <span class="k">for</span> <span class="n">entry_dict</span> <span class="ow">in</span> <span class="n">bibdb_master</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="n">mongo_master</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">entry_dict</span><span class="p">)</span>       
+        <span class="n">delete_duplicates_from_collection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_local</span><span class="p">)</span>  
+        <span class="n">delete_duplicates_from_collection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_master</span><span class="p">)</span> 
+
+<div class="viewcode-block" id="Model.update_bibtexDB"><a class="viewcode-back" href="../model.html#model.Model.update_bibtexDB">[docs]</a>    <span class="k">def</span> <span class="nf">update_bibtexDB</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">is_update</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the bibtex database with the records from the mongo database</span>
+<span class="sd">            Args:</span>
+<span class="sd">                is_update:Flag indicates if the user made any selections to update the current local file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">update_bibtex_mongoDB</span><span class="p">(</span><span class="n">is_update</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">bibdb_local</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_local</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Model.update"><a class="viewcode-back" href="../model.html#model.Model.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">is_update</span><span class="p">,</span><span class="n">list_change</span><span class="p">,</span><span class="n">list_add</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the mongodb collections</span>
+<span class="sd">            Args:</span>
+<span class="sd">                is_update:Flag indicates if the user made any selections to update the current local file</span>
+<span class="sd">                list_change: List of properties for each record that have different values on the master file and the local file</span>
+<span class="sd">                list_add: List of properties for each record that are present on the master file but not on the local</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">is_update</span><span class="p">):</span>
+            <span class="n">change_property_db</span><span class="p">(</span><span class="n">list_change</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_local</span><span class="p">)</span>
+            <span class="n">add_property_db</span><span class="p">(</span><span class="n">list_add</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_local</span><span class="p">)</span></div>
+
+        
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_local</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mongo_db</span><span class="o">.</span><span class="n">mongo_master</span><span class="o">.</span><span class="n">drop</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="change_property_db"><a class="viewcode-back" href="../model.html#model.change_property_db">[docs]</a><span class="k">def</span> <span class="nf">change_property_db</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="n">db_coll</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the records in the database collection with the modified values from the list</span>
+<span class="sd">        Args:</span>
+<span class="sd">            list: List of properties for each record that have different values on the master file and the local file</span>
+<span class="sd">            db_coll: database collection that will to be updated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">()):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">db_coll</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s">&quot;ID&quot;</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]},</span>
+                    <span class="p">{</span><span class="s">&quot;$set&quot;</span><span class="p">:{</span><span class="nb">list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span><span class="nb">list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]},</span>
+                        <span class="s">&quot;$currentDate&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;lastModified&quot;</span><span class="p">:</span><span class="bp">True</span><span class="p">}</span>
+                    <span class="p">}</span> 
+                                          
+                <span class="p">)</span></div>
+<span class="c">#     tk.destroy()</span>
+<div class="viewcode-block" id="add_property_db"><a class="viewcode-back" href="../model.html#model.add_property_db">[docs]</a><span class="k">def</span> <span class="nf">add_property_db</span><span class="p">(</span><span class="nb">list</span><span class="p">,</span><span class="n">db_coll</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Update the records in the database collection with the values from the list</span>
+<span class="sd">        Args:</span>
+<span class="sd">            list: List of properties for each record that are present on the master file but not on the local</span>
+<span class="sd">            db_coll: database collection that will to be updated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span><span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">list</span><span class="p">):</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">db_coll</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s">&quot;ID&quot;</span><span class="p">:</span><span class="nb">list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">0</span><span class="p">]},</span>
+                    <span class="p">{</span><span class="s">&quot;$set&quot;</span><span class="p">:{</span><span class="nb">list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span><span class="nb">list</span><span class="p">[</span><span class="n">idx</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]}}</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="delete_duplicates_from_collection"><a class="viewcode-back" href="../model.html#model.delete_duplicates_from_collection">[docs]</a><span class="k">def</span> <span class="nf">delete_duplicates_from_collection</span><span class="p">(</span><span class="n">coll</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Deletes duplicates entries from the collection</span>
+<span class="sd">        Args:</span>
+<span class="sd">            coll: Mongo Database Collection</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">coll</span><span class="o">.</span><span class="n">find</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">element</span><span class="p">:</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">entry</span> <span class="o">==</span><span class="s">&quot;ID&quot;</span><span class="p">):</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">element</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span>
+                
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">element</span>
+        <span class="n">coll</span><span class="o">.</span><span class="n">remove</span><span class="p">({</span><span class="s">&quot;ID&quot;</span><span class="p">:</span><span class="n">val</span><span class="p">})</span>
+        <span class="n">coll</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="update_bibtex_mongoDB"><a class="viewcode-back" href="../model.html#model.update_bibtex_mongoDB">[docs]</a><span class="k">def</span> <span class="nf">update_bibtex_mongoDB</span><span class="p">(</span><span class="n">is_update</span><span class="p">,</span><span class="n">bibdatabase</span><span class="p">,</span><span class="n">mongodb_coll</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Updates the bibtex database by comparing the properties for each record with records from the mongo database</span>
+<span class="sd">        Args:</span>
+<span class="sd">            is_update:Flag indicates if the user made any selections to update the current local file</span>
+<span class="sd">            bibdatabase: Bibtex database that needs to be updated</span>
+<span class="sd">            mongodb_coll:Mongo database collection </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">is_update</span><span class="p">):</span>  
+        <span class="k">for</span> <span class="nb">dict</span> <span class="ow">in</span> <span class="n">bibdatabase</span><span class="o">.</span><span class="n">entries</span><span class="p">:</span>
+            <span class="n">change</span> <span class="o">=</span> <span class="bp">False</span> 
+            <span class="k">if</span> <span class="nb">dict</span><span class="o">.</span><span class="n">has_key</span><span class="p">(</span><span class="s">&quot;_id&quot;</span><span class="p">):</span>
+                <span class="nb">dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&quot;_id&quot;</span><span class="p">)</span>
+            <span class="n">cursor</span> <span class="o">=</span> <span class="n">mongodb_coll</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;ID&quot;</span><span class="p">:</span><span class="nb">dict</span><span class="p">[</span><span class="s">&quot;ID&quot;</span><span class="p">]})</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">cursor</span><span class="o">.</span><span class="n">count</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">cursor</span><span class="p">:</span>
+                    <span class="n">record</span> <span class="o">=</span> <span class="n">doc</span>
+                    <span class="n">change</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="k">if</span> <span class="n">change</span><span class="p">:</span> 
+                    <span class="k">for</span> <span class="n">each</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span><span class="p">(</span><span class="n">each</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="s">&quot;_id&quot;</span> <span class="ow">and</span> <span class="n">each</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span><span class="s">&quot;lastModified&quot;</span><span class="p">):</span>
+                            <span class="nb">dict</span><span class="p">[</span><span class="n">each</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">=</span><span class="n">each</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Mohammed Ziauddin.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
