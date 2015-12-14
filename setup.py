@@ -3,7 +3,7 @@ from setuptools import setup
 #(relative to the 'root' dir, where setup.py is)
 #You could be more specific.
 
-setup(name='Bibtex_File_Comparison',
+setup(name='bibtex_comparator',
       version='1.0',
       description='This application aims to compare two bibtex files and help the user in keeping bibtex records in sync on both the files',
       # url='http://github.com/storborg/funniest',
@@ -19,7 +19,6 @@ setup(name='Bibtex_File_Comparison',
       scripts=['script'],
       classifiers = [
               'Programming Language :: Python',
-              'Development Status :: 1- Beta',
               'Natural Language :: English',
               'Intended Audience :: Developers',
               'License :: OSI Approved :: Apache Software License',
