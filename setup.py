@@ -4,7 +4,7 @@ from setuptools import setup
 #You could be more specific.
 
 setup(name='Bibtex_File_Comparison_and_Update',
-      version='1.2',
+      version='1.4',
       description='This application aims to compare two bibtex files and help the user in keeping bibtex records in sync on both the files',
       url='https://github.com/mziauddin/Bibtex-File-Comparison-and-Update',
       download_url = 'https://pypi.python.org/pypi?:action=display&name=Bibtex_File_Comparison_and_Update&version=1.1',

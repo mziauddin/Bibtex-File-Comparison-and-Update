@@ -1,0 +1,18 @@
+Metadata-Version: 1.1
+Name: Bibtex-File-Comparison-and-Update
+Version: 1.4
+Summary: This application aims to compare two bibtex files and help the user in keeping bibtex records in sync on both the files
+Home-page: https://github.com/mziauddin/Bibtex-File-Comparison-and-Update
+Author: Mohammed Ziauddin
+Author-email: mdziauddin@ku.edu
+License: UNKNOWN
+Download-URL: https://pypi.python.org/pypi?:action=display&name=Bibtex_File_Comparison_and_Update&version=1.1
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python
+Classifier: Natural Language :: English
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Classifier: Topic :: Software Development :: Libraries :: Application Frameworks
