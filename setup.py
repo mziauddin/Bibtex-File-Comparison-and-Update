@@ -3,10 +3,11 @@ from setuptools import setup
 #(relative to the 'root' dir, where setup.py is)
 #You could be more specific.
 
-setup(name='bibtex_comparator',
-      version='1.0',
+setup(name='Bibtex_File_Comparison_and_Update',
+      version='1.2',
       description='This application aims to compare two bibtex files and help the user in keeping bibtex records in sync on both the files',
-      # url='http://github.com/storborg/funniest',
+      url='https://github.com/mziauddin/Bibtex-File-Comparison-and-Update',
+      download_url = 'https://pypi.python.org/pypi?:action=display&name=Bibtex_File_Comparison_and_Update&version=1.1',
       author='Mohammed Ziauddin',
       author_email='mdziauddin@ku.edu',
       # license='MIT',
