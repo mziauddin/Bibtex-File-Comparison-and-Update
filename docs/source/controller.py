@@ -2,7 +2,7 @@
 import model
 import pymongo
 from bibtexparser import *
-from Tkinter import *
+from tkinter import *
 class Controller():
     """ This class is used as an interface between the model and the view """    
 
@@ -57,10 +57,10 @@ def connect_mongo():
     """
     try:
         conn = pymongo.MongoClient()
-        print "Connected Successfully"
+        print("Connected Successfully")
         return conn
-    except pymongo.errors.ConnectionFailure, e:
-        print "Could not connect to MongoDb"
+    except pymongo.errors.ConnectionFailure as e:
+        print("Could not connect to MongoDb")
         
 def delete_id (elem):
     """Delete the property '_id' from the dictionary

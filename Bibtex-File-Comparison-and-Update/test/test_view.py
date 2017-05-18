@@ -15,7 +15,7 @@ class ViewTest(unittest.TestCase):
     def test_negative_create_local_repo(self):
 
         import sys
-        from StringIO import StringIO
+        from io import StringIO
 
         saved_stdout = sys.stdout
         try:
