@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-import tkinter as tk        
-from tkinter import *
+import Tkinter as tk        
+from Tkinter import *
 import controller
 import os
 from git import *
 from git import Repo
 import shutil
-import tkinter, tkinter.constants, tkinter.filedialog
+import Tkinter, Tkconstants, tkFileDialog
 # from pyparsing import Each
 
 class View(tk.Frame):
@@ -36,11 +36,11 @@ class View(tk.Frame):
 
     def openmasterfile(self,event):
         """method is used to select a file from the local hard disk"""
-        self.master_file.set(tkinter.filedialog.askopenfilename()) 
+        self.master_file.set(tkFileDialog.askopenfilename()) 
 
     def openlocalfile(self,event):
         """method is used to select a file from the local hard disk"""
-        self.local_file.set(tkinter.filedialog.askopenfilename())            
+        self.local_file.set(tkFileDialog.askopenfilename())            
 
     def choose_option(self):
         """check for the option user selected and help the user select his files"""
@@ -258,7 +258,7 @@ def commit_remote(repo,file):
         repo.remotes.origin.push()
     
     except git.exc.GitCommandError:
-        print("Git Push Error")
+        print "Git Push Error"
 
 #outside        
 def create_local_repo(remote_git,dir,branch):
@@ -289,7 +289,7 @@ def create_local_repo(remote_git,dir,branch):
             return repo
         
     except git.exc.GitCommandError:
-        print("Please make sure you have the correct access rights and the repository exists")
+        print "Please make sure you have the correct access rights and the repository exists"
 
 def extract_bib_files(path):
     """ 

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import bibtexparser
-import Tkinter as tk        
-from Tkinter import *
-from ttk import *
-import Tkinter, Tkconstants, tkFileDialog
+import tkinter as tk        
+from tkinter import *
+from tkinter.ttk import *
+import tkinter, tkinter.constants, tkinter.filedialog
 
 
 class Model():
@@ -109,7 +109,7 @@ def update_bibtex_mongoDB(is_update,bibdatabase,mongodb_coll):
     if(is_update):  
         for dict in bibdatabase.entries:
             change = False 
-            if dict.has_key("_id"):
+            if "_id" in dict:
                 dict.pop("_id")
             cursor = mongodb_coll.find({"ID":dict["ID"]})
             if(cursor.count>0):
@@ -117,7 +117,7 @@ def update_bibtex_mongoDB(is_update,bibdatabase,mongodb_coll):
                     record = doc
                     change = True
                 if change: 
-                    for each in doc.items():
+                    for each in list(doc.items()):
                         if(each[0]!="_id" and each[0]!="lastModified"):
                             dict[each[0]]=each[1]
 
